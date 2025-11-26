@@ -1,7 +1,9 @@
 FROM nginx:1.29
-RUN rm -rf /usr/share/nginx/html/*
-WORKDIR /usr/share/nginx/html
+RUN rm -rf /etc/nginx/nginx.conf
+RUN rm -rf /usr/share/nginx/html/index.html
+COPY nginx.conf /etc/nginx/nginx.conf
+WORKDIR /usr/share/nginx/html/
 COPY data/ .
 COPY *.html .
-COPY nginx.conf /etc/nginx/nginx.conf
+
 
