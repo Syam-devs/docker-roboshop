@@ -1,4 +1,4 @@
-FROM nginx:1.29
+FROM nginx
 RUN rm -rf /etc/nginx/nginx.conf
 RUN rm -rf /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/index.html
