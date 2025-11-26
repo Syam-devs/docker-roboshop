@@ -5,8 +5,8 @@ networks:
     #external: true
 
 services: 
-  mogodb:
-    image: syamops/mogodb:v1
+  mongodb:
+    image: syamops/mongodb:v1
     container_name: mongodb
   catalogue: 
     image: syamops/catalogue:v1
