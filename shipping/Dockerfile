@@ -1,4 +1,4 @@
-FROM maven:3.9
+FROM maven
 WORKDIR /opt/server
 COPY src /opt/server
 COPY *.xml .
