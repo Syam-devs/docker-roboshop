@@ -1,9 +1,40 @@
-FROM maven
+# Stage 1: Build
+FROM python:3.9.23-alpine3.22 AS builder
+WORKDIR /build
+# Install build dependencies
+RUN apk add --no-cache python3-dev build-base linux-headers pcre-dev
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+# Stage 2: Final image
+FROM python:3.9.23-alpine3.22
+EXPOSE 8080
 WORKDIR /opt/server
-COPY src /opt/server/src
-COPY pom.xml .
-RUN mvn clean package 
-RUN mv /opt/server/target/shipping-1.0.jar /opt/server/shipping.jar
-ENV CART_ENDPOINT="cart:8080" \
-DB_HOST="mysql"
-CMD ["java", "-jar", "shipping.jar"]
+# Runtime dependencies only
+RUN apk add --no-cache pcre
+# Create app user
+RUN addgroup -S roboshop && adduser -S roboshop -G roboshop
+USER roboshop
+# Copy installed Python packages from builder
+COPY --from=builder /install /usr/local
+# Copy application code
+COPY --chown=roboshop:roboshop payment.ini .
+COPY --chown=roboshop:roboshop *.py .
+CMD ["uwsgi", "--ini", "payment.ini"]
+
+# FROM maven AS builder
+# WORKDIR /opt/server
+# COPY pom.xml .
+# COPY src /opt/server/src
+# RUN mvn clean package
+
+# FROM eclipse-temurin:17-jre-alpine
+# EXPOSE 8080
+# WORKDIR /opt/server
+# RUN addgroup -S roboshop && adduser -S roboshop -G roboshop
+# ENV CART_ENDPOINT="cart:8080" \
+#     DB_HOST="mysql"
+# COPY --from=builder /opt/server/target/shipping-*.jar /opt/server/shipping.jar
+# USER roboshop
+# CMD ["java","-jar","shipping.jar"]
